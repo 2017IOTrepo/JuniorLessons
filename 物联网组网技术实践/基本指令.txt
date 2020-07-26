@@ -1,0 +1,153 @@
+二、接口划分vlan
+Ruijie(config)# vlan 10
+Ruijie(config-vlan)# exit
+Ruijie(config)# vlan 20
+Ruijie(config-vlan)# exit
+Ruijie(config)# vlan 30
+Ruijie(config-vlan)# exit
+Ruijie(config)# int range fast 0/1-5
+Ruijie(config-if-range)# switchport access vlan 10
+Ruijie(config-if-range)# exit
+Ruijie(config)# int range fast 0/6-10
+Ruijie(config-if-range)# switchport access vlan 20
+Ruijie(config-if-range)# exit
+Ruijie(config)# int range fast 0/11-20
+Ruijie(config-if-range)# switchport access vlan 30
+Ruijie(config-if-range)# exit
+三、聚合链路、配置vlan地址
+二层交换机
+Ruijie(config)# int range fast 0/23-24
+Ruijie(config-if-range)# port-group 1
+Ruijie(config-if-range)# exit
+三层交换机
+Ruijie(config)# int range fast 0/23-24
+Ruijie(config-if-range)# port-group 1
+Ruijie(config-if-range)# exit
+Ruijie(config)# vlan 10
+Ruijie(config-vlan)# exit
+Ruijie(config)# vlan 20
+Ruijie(config-vlan)# exit
+Ruijie(config)# vlan 30
+Ruijie(config-vlan)# exit
+Ruijie(config)# int vlan 10
+Ruijie(config-if-VLAN 10)# ip address 192.168.10.1 255.255.255.252
+Ruijie(config-if-VLAN 10)# exit
+Ruijie(config)# int vlan 20
+Ruijie(config-if-VLAN 20)# ip address 192.168.20.1 255.255.255.252
+Ruijie(config-if-VLAN 20)# exit
+Ruijie(config)# int vlan 30
+Ruijie(config-if-VLAN 30)# ip address 192.168.30.1 255.255.255.252
+Ruijie(config-if-VLAN 30)# exit
+（其他情况）rstp，根交换机，主链路,端口速率
+Ruijie(config)# spanning-tree
+Ruijie(config)# spanning-tree mode stp
+
+Ruijie(config)# spanning-tree priority 4096
+
+Ruijie(config)# interface fastEthernet 0/2
+Ruijie(config-if)# spanning-tree port-priority 0
+
+Ruijie(config)# interface fastEthernet 0/2
+Ruijie(config-if)# speed 10	
+四、交换机连接路由器
+路由器1
+Switch(config)# interface GigabitEthernet 0/0
+Switch(config-if-GigabitEthernet 0/0)# ip address 192.168.1.1 255.255.255.252
+Switch(config-if-GigabitEthernet 0/0)# no shutdown
+Switch(config-if-GigabitEthernet 0/0)# exit
+Switch(config)# int serial 3/0
+Switch(config-if-Serial 3/0)# ip address 192.168.1.5 255.255.255.252
+Switch(config-if-Serial 3/0)# no shutdown
+路由器2
+Switch(config)# int serial 2/0
+Switch(config-if-Serial 2/0)# ip address 192.168.1.6 255.255.255.252
+Switch(config-if-Serial 2/0)# no shutdown
+三层交换机
+Ruijie(config)# int fast 0/1
+Ruijie(config-if-FastEthernet 0/1)# no switchport
+Ruijie(config-if-FastEthernet 0/1)# ip address 192.168.1.2 255.255.255.252
+Ruijie(config-if-FastEthernet 0/1)# no shutdown
+五、配置RIPV2和loopback1接口
+路由器1
+A6-RSR20-04E-2(config)#router rip
+A6-RSR20-04E-2(config-router)#version 2
+A6-RSR20-04E-2(config-router)#no auto-summary
+A6-RSR20-04E-2(config-router)#network 192.168.1.0
+A6-RSR20-04E-2(config-router)#exit
+路由器2
+A6-RS20-3(config)#router rip
+A6-RS20-3(config-router)#version 2
+A6-RS20-3(config-router)#no auto-summary
+A6-RS20-3(config-router)#network 192.168.1.0
+A6-RS20-3(config-router)#network 200.12.15.0
+A6-RS20-3(config-router)#exit
+路由器2  loopback1
+A6-RSR20-04E-2(config)#int loopback 1
+A6-RSR20-04E-2(config-if-Loopback 1)#ip address 200.12.15.2 255.255.255.240
+A6-RSR20-04E-2(config-if-Loopback 1)#exit
+A6-RSR20-04E-2(config)#ip default-network 200.12.15.1
+A6-RSR20-04E-2(config)#end
+（其他情况）交换机ospf配置
+A6-RSR20-04E-2(config)# router ospf
+A6-RSR20-04E-2(config-router)# network 192.168.1.0 0.0.0.255 area 0（配置所以与路由器已使用的接口）
+六、单臂路由
+A6-RS20-3(config)#int fast 1/0
+A6-RS20-3(config-if)#no ip address
+A6-RS20-3(config-if)#exit
+A6-RS20-3(config)# int fast 1/0.1
+A6-RS20-3(config-subif)# encapsulation dot1Q 100
+A6-RS20-3(config-subif)# ip address 192.168.1.1 255.255.255.0
+七、设置老化时间
+Ruijie(config)#mac-address-table aging-time 20
+八、为接口配置端口安全
+最大地址数、违例方式shutdown（根据题目更换）
+Ruijie(config)#int range fast 0/1-5
+Ruijie(config-if-range)#switchport mode access
+Ruijie(config-if-range)#switchport port-security
+Ruijie(config-if-range)#switchport port-security maximum 3
+Ruijie(config-if-range)#switchport port-security violation shutdown
+Ruijie(config-if-range)#exit
+（其他情况）接口配置端口绑定地址，主机mac地址，IP地址
+Ruijie(config)#int  fast 0/3
+Ruijie(config-if)#switchport mode access
+Ruijie(config-if)#switchport port-security
+Ruijie(config-if)#switchport port-security maximum 3
+Ruijie(config-if)#switchport port-security mac-address 00d0.f800.073c ip-address 192.168.12.202
+Ruijie(config-if)#exit
+九、访问列表
+A6-RS20-3(config)#access-list 100 permit tcp 192.168.10.1 0.0.0.255 host 200.12.15.1 eq www
+A6-RS20-3(config)#access-list 100 permit tcp 192.168.10.1 0.0.0.255 host 200.12.15.1 eq ftp
+A6-RS20-3(config)#access-list 100 permit tcp 192.168.10.1 0.0.0.255 host 200.12.15.1 eq ftp-data
+A6-RS20-3(config)#access-list 100 permit ip 192.168.20.1 0.0.0.255 host 200.12.15.1
+
+
+A6-RS20-3(config)#time-range off-work
+A6-RS20-3(config-time-range)#periodic weekdays 8:00 to 18:00
+A6-RS20-3(config-time-range)#exit
+A6-RS20-3(config)#access-list 100 permit ip 192.168.30.1 0.0.0.255 host 200.12.15.1
+A6-RS20-3(config)#access-list 100 deny tcp 192.168.30.1 0.0.0.255 host 200.12.15.1 eq smtp time-range off-work
+A6-RS20-3(config)#interface GigabitEthernet 0/0
+A6-RS20-3(config-if)#ip access-group 100 in
+十、nat
+VLAN访问互联网，全局有多个
+A6-RSR20-04E-2(config)#access-list 10 permit 192.168.10.0 0.0.0.255
+A6-RSR20-04E-2(config)#access-list 10 permit 192.168.20.0 0.0.0.255
+A6-RSR20-04E-2(config)#ip nat pool rui 200.12.15.3 12.15.3 200.12.15.8 netmask 255.255.255.240
+A6-RSR20-04E-2(config)#ip nat inside source list 10 pool rui
+A6-RSR20-04E-2(config)#int serial 2/0
+A6-RSR20-04E-2(config-if-Serial 2/0)#ip nat inside
+A6-RSR20-04E-2(config-if-Serial 2/0)#exit
+A6-RSR20-04E-2(config)#int loopback 1
+A6-RSR20-04E-2(config-if-Loopback 1)#ip nat outside
+A6-RSR20-04E-2(config-if-Loopback 1)#end
+若全局唯一，3，4行更换为：
+A6-RSR20-04E-2(config)#ip nat pool rui 200.12.15.3 12.15.3 200.12.15.3 netmask 255.255.255.240
+A6-RSR20-04E-2(config)#ip nat inside source list 10 pool rui overload
+内网服务器对外发布，全局地址（一对一，静态nat）
+A6-RSR20-04E-2(config)#ip nat inside source static 192.168.1.99 212.5.16.6
+A6-RSR20-04E-2(config)#int serial 2/0
+A6-RSR20-04E-2(config-if-Serial 2/0)#ip nat inside
+A6-RSR20-04E-2(config-if-Serial 2/0)#exit
+A6-RSR20-04E-2(config)#int loopback 1
+A6-RSR20-04E-2(config-if-Loopback 1)#ip nat outside
+A6-RSR20-04E-2(config-if-Loopback 1)#end

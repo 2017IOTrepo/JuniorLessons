@@ -1,0 +1,14 @@
+实验一：Linux命令
+实验目的：掌握linux的常用命令
+实验内容：
+(1)在/home/edu目录下建立一个名为cmd_test的目录。
+(2)进入cmd_test目录
+(3)将文件/lib/目录下所有以包含.so(*.so*)的文件复制到cmd_test目录下
+(4)将cmd_test目录下后缀为.so文件打包成so.tar.bz2
+(5)将cmd_test目录下后缀为.so的文件打包并压缩为so.tar.gz
+(6)在cmd_test目录下创建c_test文件夹
+(7)将so.tar.gz解压到c_test目录下
+(8)将so.tar.gz删除
+(9)使用 > 将 dev目录下的所有文件名保存在cmd_test下的dev.txt中
+(10)使用grep命令找出其中console出现的位置
+
